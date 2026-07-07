@@ -1,0 +1,44 @@
+{
+  "schema": "partner-redemption-comparator.saved-scenarios.v1",
+  "exportedAt": "2026-07-07T00:00:00.000Z",
+  "instructions": "Rename this file to saved-scenarios.json and upload it to the same GitHub Pages repository as the HTML app, or use the app's Export saved JSON button to generate your own file.",
+  "savedScenarios": [
+    {
+      "id": "scenario-example-1",
+      "name": "Example: 3 airline award options",
+      "savedAt": "2026-07-07T00:00:00.000Z",
+      "data": {
+        "scenarioName": "Example: 3 airline award options",
+        "cashPrice": "4,200",
+        "valuationMonth": "July 2026",
+        "sourceLabel": "TPG July 2026",
+        "options": [
+          {
+            "selectedProgram": "Air Canada Aeroplan",
+            "manualName": "",
+            "points": "70,000",
+            "fees": "92.20",
+            "cpp": "1.50",
+            "notes": "Business class award example"
+          },
+          {
+            "selectedProgram": "United MileagePlus",
+            "manualName": "",
+            "points": "88,000",
+            "fees": "5.60",
+            "cpp": "1.30",
+            "notes": "Same route via United pricing"
+          },
+          {
+            "selectedProgram": "Flying Blue",
+            "manualName": "",
+            "points": "73,500",
+            "fees": "228.00",
+            "cpp": "1.55",
+            "notes": "Promo or partner award example"
+          }
+        ]
+      }
+    }
+  ]
+}
