@@ -1,0 +1,1387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Airline & Hotel Partner Redemption Comparator</title>
+  <style>
+    :root {
+      --bg: #f5f7fb;
+      --panel: #ffffff;
+      --panel-soft: #f8fafc;
+      --text: #172033;
+      --muted: #64748b;
+      --line: #dbe3ef;
+      --brand: #2563eb;
+      --brand-dark: #1d4ed8;
+      --good: #16a34a;
+      --good-bg: #dcfce7;
+      --warn: #f59e0b;
+      --warn-bg: #fef3c7;
+      --bad: #dc2626;
+      --bad-bg: #fee2e2;
+      --purple: #7c3aed;
+      --purple-bg: #ede9fe;
+      --shadow: 0 16px 40px rgba(15, 23, 42, 0.08);
+      --radius: 18px;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top left, rgba(37, 99, 235, 0.10), transparent 32rem),
+        radial-gradient(circle at top right, rgba(124, 58, 237, 0.10), transparent 30rem),
+        var(--bg);
+      line-height: 1.45;
+    }
+
+    .wrap {
+      max-width: 1220px;
+      margin: 0 auto;
+      padding: 28px 18px 56px;
+    }
+
+    header.hero {
+      background: linear-gradient(135deg, #111827, #1e3a8a 58%, #4c1d95);
+      color: #fff;
+      border-radius: 26px;
+      padding: 28px;
+      box-shadow: var(--shadow);
+      position: relative;
+      overflow: hidden;
+    }
+
+    header.hero::after {
+      content: "";
+      position: absolute;
+      inset: auto -8rem -8rem auto;
+      width: 20rem;
+      height: 20rem;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.10);
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      gap: 8px;
+      align-items: center;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.14);
+      font-weight: 700;
+      font-size: 12px;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      margin: 16px 0 8px;
+      font-size: clamp(28px, 4vw, 44px);
+      line-height: 1.05;
+      letter-spacing: -0.04em;
+      max-width: 780px;
+    }
+
+    .hero p {
+      margin: 0;
+      max-width: 850px;
+      color: rgba(255,255,255,.84);
+      font-size: 16px;
+    }
+
+    .hero-grid {
+      margin-top: 22px;
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+      position: relative;
+      z-index: 2;
+    }
+
+    .stat {
+      background: rgba(255,255,255,.12);
+      border: 1px solid rgba(255,255,255,.18);
+      border-radius: 16px;
+      padding: 14px;
+      backdrop-filter: blur(8px);
+    }
+
+    .stat .label { color: rgba(255,255,255,.72); font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; }
+    .stat .value { font-size: 20px; font-weight: 800; margin-top: 4px; }
+
+    .section {
+      margin-top: 18px;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 18px;
+    }
+
+    .section.decision-summary-section {
+      background: #e8eef7;
+      border-color: #c5d0df;
+    }
+
+    .section.decision-summary-section .section-title p {
+      color: #475569;
+    }
+
+    .section-title {
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+      justify-content: space-between;
+      margin-bottom: 14px;
+    }
+
+    .section-title h2 {
+      margin: 0;
+      font-size: 20px;
+      letter-spacing: -0.02em;
+    }
+
+    .heading-with-info {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .info-icon {
+      width: 26px;
+      height: 26px;
+      min-width: 26px;
+      padding: 0;
+      border-radius: 999px;
+      background: #dbeafe;
+      color: #1e40af;
+      border: 1px solid #bfdbfe;
+      font-weight: 900;
+      justify-content: center;
+      line-height: 1;
+    }
+
+    .info-icon:hover {
+      background: #bfdbfe;
+      color: #1e3a8a;
+    }
+
+    .section-title p { margin: 4px 0 0; color: var(--muted); font-size: 13px; }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+    .badge.good { color: #166534; background: var(--good-bg); }
+    .badge.bad { color: #991b1b; background: var(--bad-bg); }
+    .badge.warn { color: #92400e; background: var(--warn-bg); }
+    .badge.purple { color: #5b21b6; background: var(--purple-bg); }
+    .badge.neutral { color: #334155; background: #e2e8f0; }
+
+    .input-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    label {
+      display: block;
+      font-size: 12px;
+      color: #334155;
+      font-weight: 800;
+      margin-bottom: 6px;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 11px 12px;
+      font: inherit;
+      background: #fff;
+      color: var(--text);
+      outline: none;
+      transition: border .15s, box-shadow .15s, background .15s;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      border-color: rgba(37,99,235,.72);
+      box-shadow: 0 0 0 4px rgba(37,99,235,.12);
+    }
+
+    input[readonly] { background: #f8fafc; color: #475569; }
+
+    .tiny-hint {
+      margin-top: 6px;
+      color: var(--muted);
+      font-size: 11px;
+    }
+
+    .compare-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+      align-items: stretch;
+    }
+
+    .card {
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: var(--panel-soft);
+      padding: 14px;
+      position: relative;
+      transition: transform .16s, box-shadow .16s, border-color .16s;
+    }
+
+    .card.winner {
+      border-color: rgba(22, 163, 74, .72);
+      box-shadow: 0 0 0 4px rgba(22, 163, 74, .12), var(--shadow);
+      transform: translateY(-2px);
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .option-title { font-weight: 900; font-size: 16px; }
+    .option-subtitle { color: var(--muted); font-size: 12px; margin-top: 2px; }
+
+    .field-stack {
+      display: grid;
+      gap: 10px;
+    }
+
+    .two-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .result-box {
+      margin-top: 12px;
+      display: grid;
+      gap: 8px;
+      border-radius: 16px;
+      padding: 12px;
+      background: #fff;
+      border: 1px solid var(--line);
+    }
+
+    .metric {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding-bottom: 8px;
+      border-bottom: 1px dashed #dbe3ef;
+    }
+    .metric:last-child { border-bottom: 0; padding-bottom: 0; }
+    .metric span:first-child { color: var(--muted); font-size: 12px; font-weight: 700; }
+    .metric span:last-child { font-weight: 900; text-align: right; }
+    .metric.big span:last-child { font-size: 22px; color: #0f172a; }
+    .metric.good span:last-child { color: var(--good); }
+    .metric.bad span:last-child { color: var(--bad); }
+
+    .decision-panel {
+      display: grid;
+      grid-template-columns: 1.4fr .9fr;
+      gap: 14px;
+      align-items: stretch;
+    }
+
+    .winner-box {
+      border-radius: 18px;
+      background: linear-gradient(135deg, #dbeafe, #d1fae5);
+      border: 1px solid rgba(37, 99, 235, .28);
+      padding: 16px;
+    }
+
+    .winner-box h3 {
+      margin: 0 0 6px;
+      font-size: 22px;
+      letter-spacing: -0.02em;
+    }
+
+    .winner-box p { margin: 0; color: #334155; }
+
+    .reason-list {
+      margin: 12px 0 0;
+      padding-left: 18px;
+      color: #334155;
+    }
+
+    .summary-table {
+      width: 100%;
+      border-collapse: collapse;
+      overflow: hidden;
+      border-radius: 14px;
+      font-size: 13px;
+    }
+
+    .summary-table th, .summary-table td {
+      padding: 10px 9px;
+      border-bottom: 1px solid var(--line);
+      text-align: right;
+    }
+
+    .summary-table th:first-child, .summary-table td:first-child { text-align: left; }
+    .summary-table th { background: #dbeafe; color: #1e3a8a; font-size: 12px; text-transform: uppercase; letter-spacing: .04em; }
+    .summary-table tr:last-child td { border-bottom: 0; }
+    .summary-table td { background: rgba(255, 255, 255, .78); }
+    .summary-table tr.row-winner td { background: #bbf7d0; font-weight: 800; }
+
+    .button-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+    }
+
+    button, .button-link {
+      border: 0;
+      border-radius: 12px;
+      padding: 10px 13px;
+      background: var(--brand);
+      color: #fff;
+      font-weight: 900;
+      cursor: pointer;
+      font: inherit;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: background .15s, transform .15s;
+    }
+
+    button:hover, .button-link:hover { background: var(--brand-dark); transform: translateY(-1px); }
+    button.secondary { background: #e2e8f0; color: #0f172a; }
+    button.secondary:hover { background: #cbd5e1; }
+    button.danger { background: #dc2626; }
+    button.danger:hover { background: #b91c1c; }
+
+    textarea {
+      min-height: 170px;
+      resize: vertical;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 12px;
+      line-height: 1.45;
+    }
+
+    .library-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+
+    .source-box {
+      border-radius: 16px;
+      border: 1px solid var(--line);
+      background: #f8fafc;
+      padding: 14px;
+      color: #334155;
+      font-size: 13px;
+    }
+
+    .source-box h3 { margin: 0 0 8px; font-size: 16px; color: var(--text); }
+    .source-box a { color: var(--brand-dark); font-weight: 800; }
+
+    .program-list {
+      max-height: 260px;
+      overflow: auto;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: #fff;
+    }
+
+    .program-list table { width: 100%; border-collapse: collapse; font-size: 12px; }
+    .program-list th, .program-list td { padding: 8px 9px; border-bottom: 1px solid #eef2f7; text-align: left; }
+    .program-list th { position: sticky; top: 0; background: #f8fafc; }
+    .program-list td:last-child, .program-list th:last-child { text-align: right; font-weight: 800; }
+
+    .prompt-modal {
+      position: fixed;
+      inset: 0;
+      display: none;
+      place-items: center;
+      padding: 18px;
+      background: rgba(15, 23, 42, .55);
+      z-index: 90;
+    }
+
+    .prompt-modal.show { display: grid; }
+
+    .prompt-dialog {
+      width: min(760px, 100%);
+      max-height: min(86vh, 760px);
+      overflow: auto;
+      border-radius: 20px;
+      background: #fff;
+      border: 1px solid var(--line);
+      box-shadow: 0 24px 70px rgba(15, 23, 42, .32);
+      padding: 18px;
+    }
+
+    .prompt-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+      margin-bottom: 10px;
+    }
+
+    .prompt-header h3 {
+      margin: 0;
+      font-size: 20px;
+      letter-spacing: -0.02em;
+    }
+
+    .prompt-header p {
+      margin: 4px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .close-modal {
+      width: 34px;
+      height: 34px;
+      padding: 0;
+      border-radius: 999px;
+      background: #e2e8f0;
+      color: #0f172a;
+      justify-content: center;
+      font-size: 20px;
+      line-height: 1;
+    }
+
+    .close-modal:hover { background: #cbd5e1; }
+
+    #tpgPromptText {
+      min-height: 260px;
+      background: #f8fafc;
+      color: #0f172a;
+    }
+
+    .toast {
+      position: fixed;
+      right: 18px;
+      bottom: 18px;
+      background: #0f172a;
+      color: #fff;
+      padding: 12px 14px;
+      border-radius: 14px;
+      box-shadow: var(--shadow);
+      max-width: 420px;
+      font-size: 13px;
+      display: none;
+      z-index: 100;
+    }
+
+    .toast.show { display: block; animation: fadeInOut 3.2s ease both; }
+    @keyframes fadeInOut {
+      0% { opacity: 0; transform: translateY(10px); }
+      10%, 85% { opacity: 1; transform: translateY(0); }
+      100% { opacity: 0; transform: translateY(10px); }
+    }
+
+    @media (max-width: 980px) {
+      .hero-grid, .input-grid, .compare-grid, .decision-panel, .library-grid { grid-template-columns: 1fr; }
+    }
+
+    @media print {
+      body { background: #fff; }
+      button, .button-link, textarea, .no-print { display: none !important; }
+      .wrap { padding: 0; }
+      .section, header.hero { box-shadow: none; }
+      header.hero { color: #0f172a; background: #fff; border: 1px solid #dbe3ef; }
+      .hero p, .stat .label, .stat .value { color: #0f172a; }
+      .stat { background: #fff; border: 1px solid #dbe3ef; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header class="hero">
+      <div class="eyebrow">Partner Redemption Decision Template</div>
+      <h1>Compare 3 airline or hotel redemptions by effective total cost.</h1>
+      <p>
+        Enter points required, published CPP value, and taxes/fees for up to three airline or hotel programs.
+        The option with the lowest effective redemption cost wins.
+      </p>
+      <div class="hero-grid">
+        <div class="stat">
+          <div class="label">Decision Rule</div>
+          <div class="value">Lowest cost wins</div>
+        </div>
+        <div class="stat">
+          <div class="label">Point Cost</div>
+          <div class="value">Points × CPP</div>
+        </div>
+        <div class="stat">
+          <div class="label">Total Cost</div>
+          <div class="value">Point cost + fees</div>
+        </div>
+        <div class="stat">
+          <div class="label">Default Source</div>
+          <div class="value" id="defaultSourceValue">TPG July 2026</div>
+        </div>
+      </div>
+    </header>
+
+    <section class="section">
+      <div class="section-title">
+        <div>
+          <h2>Trip / Stay Baseline</h2>
+          <p>Cash price is optional, but useful for measuring realized CPP and whether redemption beats paying cash.</p>
+        </div>
+        <span class="badge purple" id="valuationAsOfBadge">TPG July 2026 defaults</span>
+      </div>
+      <div class="input-grid">
+        <div>
+          <label for="scenarioName">Scenario name</label>
+          <input id="scenarioName" type="text" value="Sample award comparison" />
+        </div>
+        <div>
+          <label for="cashPrice">Comparable cash price ($)</label>
+          <input id="cashPrice" type="text" inputmode="decimal" value="1,200" data-number-format="decimal" />
+          <div class="tiny-hint">Use the same flight, cabin, hotel, dates, and cancellation rules where possible.</div>
+        </div>
+        <div>
+          <label for="valuationMonth">CPP valuation month</label>
+          <input id="valuationMonth" type="text" value="July 2026" />
+        </div>
+        <div>
+          <label for="decisionMode">Winner logic</label>
+          <input id="decisionMode" type="text" value="Lowest effective redemption cost" readonly />
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-title">
+        <div>
+          <h2>Compare Options</h2>
+          <p>Select an airline or hotel program. CPP will auto-fill from the library, but remains editable.</p>
+        </div>
+        <div class="button-row no-print">
+          <button type="button" class="secondary" id="loadSampleBtn">Load sample</button>
+          <button type="button" class="secondary" id="clearBtn">Clear inputs</button>
+        </div>
+      </div>
+      <div class="compare-grid" id="optionGrid"></div>
+    </section>
+
+    <section class="section decision-summary-section">
+      <div class="section-title">
+        <div>
+          <h2>Decision Summary</h2>
+          <p>The winner is the valid option with the lowest total economic redemption cost.</p>
+        </div>
+        <span class="badge neutral" id="validCountBadge">0 valid options</span>
+      </div>
+      <div class="decision-panel">
+        <div class="winner-box" id="winnerBox">
+          <h3>Enter at least one valid option.</h3>
+          <p>Add points required and CPP values to calculate the winner.</p>
+          <ul class="reason-list" id="reasonList"></ul>
+        </div>
+        <div>
+          <table class="summary-table" id="summaryTable">
+            <thead>
+              <tr>
+                <th>Option</th>
+                <th>Points</th>
+                <th>CPP</th>
+                <th>Fees</th>
+                <th>Total Cost</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-title">
+        <div>
+          <div class="heading-with-info">
+            <h2>CPP Library Import / Update Template</h2>
+            <button type="button" class="info-icon no-print" id="importInfoBtn" aria-label="Show ChatGPT or Gemini prompt for TPG CPP conversion" title="Show AI prompt">i</button>
+          </div>
+          <p>Paste a refreshed CPP table to merge or replace the default values without editing this HTML file.</p>
+        </div>
+        <span class="badge warn">Admin tool</span>
+      </div>
+      <div class="library-grid">
+        <div>
+          <label for="importBox">Import JSON or CSV</label>
+          <textarea id="importBox" spellcheck="false"></textarea>
+          <div class="tiny-hint">
+            Accepted JSON keys: program, type, cpp, source, asOf. CSV header must include program and cpp.
+          </div>
+          <div class="button-row" style="margin-top: 12px;">
+            <button type="button" id="mergeBtn">Merge CPP values</button>
+            <button type="button" id="replaceBtn" class="secondary">Replace library</button>
+            <button type="button" id="exportBtn" class="secondary">Export current library</button>
+            <button type="button" id="resetLibraryBtn" class="danger">Reset defaults</button>
+          </div>
+        </div>
+        <div>
+          <div class="source-box">
+            <h3>Published CPP source</h3>
+            <p>
+              Default values are based on The Points Guy's July 2026 monthly valuations for airline miles and hotel points.
+              TPG describes these valuations as estimates, not official issuer valuations.
+            </p>
+            <p>
+              Source page: <a href="https://thepointsguy.com/loyalty-programs/monthly-valuations/" target="_blank" rel="noopener noreferrer">TPG monthly points and miles valuations</a>
+            </p>
+          </div>
+          <div class="program-list" style="margin-top: 12px;">
+            <table>
+              <thead>
+                <tr><th>Program</th><th>Type</th><th>Source</th><th>CPP</th></tr>
+              </thead>
+              <tbody id="libraryTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <div class="prompt-modal" id="tpgPromptModal" aria-hidden="true">
+    <div class="prompt-dialog" role="dialog" aria-modal="true" aria-labelledby="tpgPromptTitle">
+      <div class="prompt-header">
+        <div>
+          <h3 id="tpgPromptTitle">Prompt for updating CPP values from TPG</h3>
+          <p>Copy this into ChatGPT or Gemini with web browsing enabled, then paste the returned JSON into the import box.</p>
+        </div>
+        <button type="button" class="close-modal" id="tpgPromptClose" aria-label="Close prompt">&times;</button>
+      </div>
+      <textarea id="tpgPromptText" readonly spellcheck="false"></textarea>
+      <div class="button-row" style="margin-top: 12px;">
+        <button type="button" id="copyTpgPromptBtn">Copy prompt</button>
+        <button type="button" id="closeTpgPromptBtn" class="secondary">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    /*
+      Partner Redemption Comparator
+      Formula:
+        publishedPointValueDollars = pointsRequired * publishedCppCents / 100
+        totalRedemptionCostDollars = publishedPointValueDollars + outOfPocketFees
+        realizedCppCents = ((cashPrice - outOfPocketFees) / pointsRequired) * 100
+      Winner:
+        Lowest totalRedemptionCostDollars among valid options.
+
+      Default CPP source:
+        The Points Guy, "What are points and miles worth? TPG's July 2026 monthly valuations"
+        https://thepointsguy.com/loyalty-programs/monthly-valuations/
+    */
+
+    const DEFAULT_CPP_LIBRARY = [
+      { program: 'Aeromexico Rewards', type: 'Airline', cpp: 0.80, source: 'TPG July 2026', asOf: '2026-07-01' },
+      { program: 'Air Canada Aeroplan', type: 'Airline', cpp: 1.50, source: 'TPG July 2026', asOf: '2026-07-01' },
+      { program: 'Alaska Airlines Atmos Rewards', type: 'Airline', cpp: 1.55, source: 'TPG July 2026', asOf: '2026-07-01' },
+      { program: 'American Airlines AAdvantage', type: 'Airline', cpp: 1.40, source: 'TPG July 2026', asOf: '2026-07-01' },
+      { program: 'ANA Mileage Club', type: 'Airline', cpp: 1.40, source: 'TPG July 2026', asOf: '2026-07-01' },
+      { program: 'Avianca LifeMiles', type: 'Airline', cpp: 1.45, source: 'TPG July 2026', asOf: '2026-07-01' },
+      { program: 'Avios', type: 'Airline', cpp: 1.40, source: 'TPG July 2026', asOf: '2026-07-01' },
+      { program: 'Cathay Asia Miles', type: 'Airline', cpp: 1.30, source: 'TPG July 2026', asOf: '2026-07-01' },
+      { program: 'Delta SkyMiles', type: 'Airline', cpp: 1.20, source: 'TPG July 2026', asOf: '2026-07-01' },
+      { program: 'Emirates Skywards', type: 'Airline', cpp: 1.20, source: 'TPG July 2026', asOf: '2026-07-01' },
+      { program: 'Etihad Guest', type: 'Airline', cpp: 1.20, source: 'TPG July 2026', asOf: '2026-07-01' },
+      { program: 'Flying Blue', type: 'Airline', cpp: 1.55, source: 'TPG July 2026', asOf: '2026-07-01' },
+      { program: 'Frontier Miles', type: 'Airline', cpp: 1.30, source: 'TPG July 2026', asOf: '2026-07-01' },
+      { program: 'JetBlue TrueBlue', type: 'Airline', cpp: 1.35, source: 'TPG July 2026', asOf: '2026-07-01' },
+      { program: 'Qantas Frequent Flyer', type: 'Airline', cpp: 1.30, source: 'TPG July 2026', asOf: '2026-07-01' },
+      { program: 'Singapore KrisFlyer', type: 'Airline', cpp: 1.30, source: 'TPG July 2026', asOf: '2026-07-01' },
+      { program: 'Southwest Rapid Rewards', type: 'Airline', cpp: 1.25, source: 'TPG July 2026', asOf: '2026-07-01' },
+      { program: 'Turkish Airlines Miles&Smiles', type: 'Airline', cpp: 1.10, source: 'TPG July 2026', asOf: '2026-07-01' },
+      { program: 'United MileagePlus', type: 'Airline', cpp: 1.30, source: 'TPG July 2026', asOf: '2026-07-01' },
+      { program: 'Virgin Atlantic Flying Club', type: 'Airline', cpp: 1.50, source: 'TPG July 2026', asOf: '2026-07-01' },
+      { program: 'Accor Live Limitless', type: 'Hotel', cpp: 2.00, source: 'TPG July 2026', asOf: '2026-07-01' },
+      { program: 'Best Western Rewards', type: 'Hotel', cpp: 0.60, source: 'TPG July 2026', asOf: '2026-07-01' },
+      { program: 'Choice Privileges', type: 'Hotel', cpp: 0.70, source: 'TPG July 2026', asOf: '2026-07-01' },
+      { program: 'Hilton Honors', type: 'Hotel', cpp: 0.40, source: 'TPG July 2026', asOf: '2026-07-01' },
+      { program: 'IHG One Rewards', type: 'Hotel', cpp: 0.60, source: 'TPG July 2026', asOf: '2026-07-01' },
+      { program: 'Marriott Bonvoy', type: 'Hotel', cpp: 0.80, source: 'TPG July 2026', asOf: '2026-07-01' },
+      { program: 'World of Hyatt', type: 'Hotel', cpp: 1.60, source: 'TPG July 2026', asOf: '2026-07-01' },
+      { program: 'Wyndham Rewards', type: 'Hotel', cpp: 0.70, source: 'TPG July 2026', asOf: '2026-07-01' }
+    ];
+
+    const SAMPLE_OPTIONS = [
+      { program: 'Air Canada Aeroplan', points: 70000, fees: 92.20, notes: 'Business class award example' },
+      { program: 'United MileagePlus', points: 88000, fees: 5.60, notes: 'Same route via United pricing' },
+      { program: 'Flying Blue', points: 73500, fees: 228.00, notes: 'Promo/partner award example' }
+    ];
+
+    const STORAGE_KEY = 'partnerRedemptionComparatorCppLibrary.v1';
+    const SOURCE_STORAGE_KEY = 'partnerRedemptionComparatorCppSourceLabel.v1';
+    let cppLibrary = loadLibrary();
+    let currentSourceLabel = loadCurrentSourceLabel();
+
+    const fmtCurrency = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 2 });
+    const fmtNumber = new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 });
+    const fmtCpp = (value) => Number.isFinite(value) ? `${value.toFixed(2)}¢` : '—';
+
+    const optionGrid = document.getElementById('optionGrid');
+    const summaryBody = document.querySelector('#summaryTable tbody');
+    const winnerBox = document.getElementById('winnerBox');
+    const reasonList = document.getElementById('reasonList');
+    const validCountBadge = document.getElementById('validCountBadge');
+    const importBox = document.getElementById('importBox');
+    const libraryTableBody = document.getElementById('libraryTableBody');
+    const valuationAsOfBadge = document.getElementById('valuationAsOfBadge');
+    const defaultSourceValue = document.getElementById('defaultSourceValue');
+
+    const TPG_IMPORT_PROMPT = `Use ChatGPT or Gemini with web browsing enabled to update my points/miles CPP import table.
+
+Source page:
+https://thepointsguy.com/loyalty-programs/monthly-valuations/
+
+Task:
+1. Open the TPG monthly valuations page.
+2. Extract ONLY the current airline points/miles valuation table and hotel points valuation table.
+3. Do not include transferable bank currencies such as Amex, Chase, Capital One, Citi, Bilt, or Wells Fargo.
+4. Convert each row into this JSON schema:
+   { "program": "Program Name", "type": "Airline or Hotel", "cpp": 1.50, "source": "TPG Month YYYY", "asOf": "YYYY-MM-DD" }
+5. Use cents per point/mile as the numeric cpp value. Example: 1.5 cents should be 1.5, not 0.015.
+6. Preserve program names exactly as TPG publishes them when possible.
+7. Return ONLY a valid JSON array. No markdown, no explanation, no citations, no extra text.
+8. Before finalizing, double-check that every row has program, type, cpp, source, and asOf.
+
+Expected output example:
+[
+  { "program": "Air Canada Aeroplan", "type": "Airline", "cpp": 1.50, "source": "TPG July 2026", "asOf": "2026-07-01" },
+  { "program": "World of Hyatt", "type": "Hotel", "cpp": 1.60, "source": "TPG July 2026", "asOf": "2026-07-01" }
+]`; 
+
+    document.addEventListener('DOMContentLoaded', () => {
+      buildOptionCards();
+      populateImportTemplate();
+      renderLibraryTable();
+      wireGlobalEvents();
+      wireNumberFormatters();
+      wireTpgPromptModal();
+      loadSample();
+      formatAllNumberInputs();
+      updateSourceBadges();
+      calculate();
+    });
+
+    function loadLibrary() {
+      try {
+        const saved = localStorage.getItem(STORAGE_KEY);
+        if (!saved) return clone(DEFAULT_CPP_LIBRARY);
+        const parsed = JSON.parse(saved);
+        return normalizeLibrary(parsed).length ? normalizeLibrary(parsed) : clone(DEFAULT_CPP_LIBRARY);
+      } catch (error) {
+        console.warn('Could not load saved CPP library:', error);
+        return clone(DEFAULT_CPP_LIBRARY);
+      }
+    }
+
+    function saveLibrary() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(cppLibrary));
+    }
+
+    function loadCurrentSourceLabel() {
+      return localStorage.getItem(SOURCE_STORAGE_KEY) || '';
+    }
+
+    function saveCurrentSourceLabel() {
+      localStorage.setItem(SOURCE_STORAGE_KEY, currentSourceLabel || getLibrarySourceLabel());
+    }
+
+    function clone(value) {
+      return JSON.parse(JSON.stringify(value));
+    }
+
+    function normalizeProgramName(name) {
+      return String(name || '').trim().replace(/\s+/g, ' ');
+    }
+
+    function normalizeLibrary(rows) {
+      if (!Array.isArray(rows)) return [];
+      const seen = new Map();
+      rows.forEach(row => {
+        const program = normalizeProgramName(row.program || row.Program || row.name || row.Name);
+        const cpp = parseFloat(row.cpp ?? row.CPP ?? row.valuation ?? row.value);
+        if (!program || !Number.isFinite(cpp) || cpp < 0) return;
+        seen.set(program.toLowerCase(), {
+          program,
+          type: normalizeProgramName(row.type || row.Type || 'Custom') || 'Custom',
+          cpp,
+          source: normalizeProgramName(row.source || row.Source || 'Imported'),
+          asOf: normalizeProgramName(row.asOf || row.as_of || row.date || row.Date || '')
+        });
+      });
+      return Array.from(seen.values()).sort((a, b) => a.type.localeCompare(b.type) || a.program.localeCompare(b.program));
+    }
+
+    function getProgram(programName) {
+      const key = normalizeProgramName(programName).toLowerCase();
+      return cppLibrary.find(item => item.program.toLowerCase() === key);
+    }
+
+    function buildOptionCards() {
+      optionGrid.innerHTML = '';
+      for (let i = 0; i < 3; i++) {
+        const card = document.createElement('article');
+        card.className = 'card';
+        card.id = `optionCard${i}`;
+        card.innerHTML = `
+          <div class="card-header">
+            <div>
+              <div class="option-title">Option ${i + 1}</div>
+              <div class="option-subtitle" id="optionSubtitle${i}">Select a program</div>
+            </div>
+            <span class="badge neutral" id="optionBadge${i}">Pending</span>
+          </div>
+          <div class="field-stack">
+            <div>
+              <label for="program${i}">Airline / Hotel Program</label>
+              <select id="program${i}" data-index="${i}" class="program-select"></select>
+            </div>
+            <div class="two-col">
+              <div>
+                <label for="points${i}">Points required</label>
+                <input id="points${i}" type="text" inputmode="numeric" data-number-format="integer" data-index="${i}" class="calc-input" />
+              </div>
+              <div>
+                <label for="fees${i}">Taxes / fees ($)</label>
+                <input id="fees${i}" type="text" inputmode="decimal" value="0" data-number-format="decimal" data-index="${i}" class="calc-input" />
+              </div>
+            </div>
+            <div class="two-col">
+              <div>
+                <label for="cpp${i}">Published CPP</label>
+                <input id="cpp${i}" type="number" min="0" step="0.01" data-index="${i}" class="calc-input" />
+                <div class="tiny-hint" id="sourceHint${i}">Auto-filled from CPP library.</div>
+              </div>
+              <div>
+                <label for="manualName${i}">Custom name</label>
+                <input id="manualName${i}" type="text" data-index="${i}" class="calc-input" placeholder="Optional override" />
+              </div>
+            </div>
+            <div>
+              <label for="notes${i}">Notes</label>
+              <input id="notes${i}" type="text" data-index="${i}" class="calc-input" placeholder="Route, cabin, hotel, transfer bonus, etc." />
+            </div>
+          </div>
+          <div class="result-box">
+            <div class="metric big"><span>Total redemption cost</span><span id="totalCost${i}">—</span></div>
+            <div class="metric"><span>Value of points used</span><span id="pointCost${i}">—</span></div>
+            <div class="metric"><span>Realized CPP</span><span id="realizedCpp${i}">—</span></div>
+            <div class="metric"><span>Vs. published CPP</span><span id="cppSpread${i}">—</span></div>
+            <div class="metric"><span>Cash vs. redeem</span><span id="cashCompare${i}">—</span></div>
+          </div>
+        `;
+        optionGrid.appendChild(card);
+      }
+      refreshProgramSelects();
+      document.querySelectorAll('.program-select').forEach(select => {
+        select.addEventListener('change', (event) => {
+          const index = Number(event.target.dataset.index);
+          applyProgramToOption(index, event.target.value);
+          calculate();
+        });
+      });
+      document.querySelectorAll('.calc-input').forEach(input => input.addEventListener('input', calculate));
+    }
+
+    function refreshProgramSelects() {
+      const grouped = cppLibrary.reduce((acc, item) => {
+        acc[item.type] = acc[item.type] || [];
+        acc[item.type].push(item);
+        return acc;
+      }, {});
+
+      document.querySelectorAll('.program-select').forEach(select => {
+        const current = select.value;
+        select.innerHTML = '<option value="">Select program...</option>';
+        Object.keys(grouped).sort().forEach(type => {
+          const optgroup = document.createElement('optgroup');
+          optgroup.label = type;
+          grouped[type].sort((a, b) => a.program.localeCompare(b.program)).forEach(item => {
+            const option = document.createElement('option');
+            option.value = item.program;
+            option.textContent = `${item.program} (${item.cpp.toFixed(2)}¢)`;
+            optgroup.appendChild(option);
+          });
+          select.appendChild(optgroup);
+        });
+        const custom = document.createElement('option');
+        custom.value = '__CUSTOM__';
+        custom.textContent = 'Custom / not in library';
+        select.appendChild(custom);
+        if ([...select.options].some(o => o.value === current)) select.value = current;
+      });
+    }
+
+    function applyProgramToOption(index, programName) {
+      const sourceHint = document.getElementById(`sourceHint${index}`);
+      if (!programName || programName === '__CUSTOM__') {
+        if (programName === '__CUSTOM__') {
+          sourceHint.textContent = 'Enter a custom name and CPP manually.';
+        } else {
+          sourceHint.textContent = 'Auto-filled from CPP library.';
+        }
+        return;
+      }
+      const program = getProgram(programName);
+      if (!program) return;
+      document.getElementById(`cpp${index}`).value = program.cpp;
+      document.getElementById(`manualName${index}`).value = '';
+      sourceHint.textContent = `${program.source}${program.asOf ? `, ${program.asOf}` : ''}`;
+    }
+
+    function refreshSelectedOptionCppValues() {
+      for (let i = 0; i < 3; i++) {
+        const select = document.getElementById(`program${i}`);
+        if (select && select.value && select.value !== '__CUSTOM__') {
+          applyProgramToOption(i, select.value);
+        }
+      }
+    }
+
+    function wireNumberFormatters() {
+      document.querySelectorAll('[data-number-format]').forEach(input => {
+        input.addEventListener('input', () => {
+          input.value = formatNumberForInput(input.value, input.dataset.numberFormat, false);
+        });
+        input.addEventListener('blur', () => {
+          input.value = formatNumberForInput(input.value, input.dataset.numberFormat, true);
+          calculate();
+        });
+      });
+    }
+
+    function formatAllNumberInputs() {
+      document.querySelectorAll('[data-number-format]').forEach(input => {
+        input.value = formatNumberForInput(input.value, input.dataset.numberFormat, true);
+      });
+    }
+
+    function formatNumberForInput(raw, format, finalize) {
+      let text = String(raw || '').replace(/,/g, '').replace(/[^0-9.]/g, '');
+      const firstDot = text.indexOf('.');
+      if (firstDot !== -1) {
+        text = text.slice(0, firstDot + 1) + text.slice(firstDot + 1).replace(/\./g, '');
+      }
+      if (!text || text === '.') return finalize ? '' : text;
+
+      let [integerPart, decimalPart = ''] = text.split('.');
+      integerPart = integerPart.replace(/^0+(?=\d)/, '') || '0';
+      const formattedInteger = new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(Number(integerPart));
+
+      if (format === 'integer') return formattedInteger;
+
+      decimalPart = decimalPart.slice(0, 2);
+      if (text.endsWith('.') && !finalize) return `${formattedInteger}.`;
+      if (text.includes('.')) return `${formattedInteger}.${decimalPart}`;
+      return formattedInteger;
+    }
+
+    function parseFormattedNumber(value) {
+      const cleaned = String(value || '').replace(/,/g, '');
+      const number = parseFloat(cleaned);
+      return Number.isFinite(number) ? number : NaN;
+    }
+
+    function getLibrarySourceLabel() {
+      const sources = [...new Set(cppLibrary.map(item => item.source).filter(Boolean))];
+      const asOfs = [...new Set(cppLibrary.map(item => item.asOf).filter(Boolean))];
+      if (sources.length === 1) return sources[0];
+      if (sources.length > 1 && asOfs.length === 1) return `Mixed sources, ${asOfs[0]}`;
+      if (sources.length > 1) return `${sources.length} CPP sources`;
+      if (asOfs.length === 1) return `CPP values as of ${asOfs[0]}`;
+      return 'Current CPP library';
+    }
+
+    function updateSourceBadges() {
+      const sourceLabel = currentSourceLabel || getLibrarySourceLabel();
+      defaultSourceValue.textContent = sourceLabel;
+      valuationAsOfBadge.textContent = `${sourceLabel} CPP library`;
+    }
+
+    function wireTpgPromptModal() {
+      const modal = document.getElementById('tpgPromptModal');
+      const promptText = document.getElementById('tpgPromptText');
+      const openBtn = document.getElementById('importInfoBtn');
+      const closeButtons = [document.getElementById('tpgPromptClose'), document.getElementById('closeTpgPromptBtn')];
+      promptText.value = TPG_IMPORT_PROMPT;
+
+      openBtn.addEventListener('click', () => {
+        modal.classList.add('show');
+        modal.setAttribute('aria-hidden', 'false');
+        promptText.focus();
+        promptText.select();
+      });
+
+      closeButtons.forEach(button => button.addEventListener('click', closeTpgPromptModal));
+      modal.addEventListener('click', event => {
+        if (event.target === modal) closeTpgPromptModal();
+      });
+      document.addEventListener('keydown', event => {
+        if (event.key === 'Escape' && modal.classList.contains('show')) closeTpgPromptModal();
+      });
+      document.getElementById('copyTpgPromptBtn').addEventListener('click', copyTpgPrompt);
+    }
+
+    function closeTpgPromptModal() {
+      const modal = document.getElementById('tpgPromptModal');
+      modal.classList.remove('show');
+      modal.setAttribute('aria-hidden', 'true');
+    }
+
+    async function copyTpgPrompt() {
+      const text = document.getElementById('tpgPromptText').value;
+      try {
+        await navigator.clipboard.writeText(text);
+        showToast('TPG update prompt copied.');
+      } catch (error) {
+        document.getElementById('tpgPromptText').select();
+        document.execCommand('copy');
+        showToast('TPG update prompt copied.');
+      }
+    }
+
+    function wireGlobalEvents() {
+      ['scenarioName', 'cashPrice', 'valuationMonth'].forEach(id => {
+        document.getElementById(id).addEventListener('input', calculate);
+      });
+      document.getElementById('loadSampleBtn').addEventListener('click', () => { loadSample(); calculate(); });
+      document.getElementById('clearBtn').addEventListener('click', () => { clearInputs(); calculate(); });
+      document.getElementById('mergeBtn').addEventListener('click', () => importCppValues('merge'));
+      document.getElementById('replaceBtn').addEventListener('click', () => importCppValues('replace'));
+      document.getElementById('exportBtn').addEventListener('click', exportCurrentLibrary);
+      document.getElementById('resetLibraryBtn').addEventListener('click', resetLibrary);
+    }
+
+    function loadSample() {
+      document.getElementById('scenarioName').value = 'Example: 3 airline award options';
+      document.getElementById('cashPrice').value = 4200;
+      SAMPLE_OPTIONS.forEach((sample, index) => {
+        document.getElementById(`program${index}`).value = sample.program;
+        applyProgramToOption(index, sample.program);
+        document.getElementById(`points${index}`).value = sample.points;
+        document.getElementById(`fees${index}`).value = sample.fees;
+        document.getElementById(`notes${index}`).value = sample.notes;
+      });
+      formatAllNumberInputs();
+    }
+
+    function clearInputs() {
+      document.getElementById('scenarioName').value = '';
+      document.getElementById('cashPrice').value = '';
+      for (let i = 0; i < 3; i++) {
+        document.getElementById(`program${i}`).value = '';
+        document.getElementById(`points${i}`).value = '';
+        document.getElementById(`fees${i}`).value = '0';
+        document.getElementById(`cpp${i}`).value = '';
+        document.getElementById(`manualName${i}`).value = '';
+        document.getElementById(`notes${i}`).value = '';
+        document.getElementById(`sourceHint${i}`).textContent = 'Auto-filled from CPP library.';
+      }
+    }
+
+    function readOption(index) {
+      const selectedProgram = document.getElementById(`program${index}`).value;
+      const manualName = normalizeProgramName(document.getElementById(`manualName${index}`).value);
+      const program = selectedProgram === '__CUSTOM__' ? manualName : (manualName || selectedProgram);
+      const points = parseFormattedNumber(document.getElementById(`points${index}`).value);
+      const fees = parseFormattedNumber(document.getElementById(`fees${index}`).value) || 0;
+      const cpp = parseFormattedNumber(document.getElementById(`cpp${index}`).value);
+      const notes = document.getElementById(`notes${index}`).value.trim();
+      const valid = !!program && Number.isFinite(points) && points > 0 && Number.isFinite(cpp) && cpp >= 0;
+      const pointCost = valid ? points * cpp / 100 : NaN;
+      const totalCost = valid ? pointCost + fees : NaN;
+      const cashPrice = parseFormattedNumber(document.getElementById('cashPrice').value);
+      const realizedCpp = valid && Number.isFinite(cashPrice) && cashPrice > 0 ? ((cashPrice - fees) / points) * 100 : NaN;
+      const spread = Number.isFinite(realizedCpp) ? realizedCpp - cpp : NaN;
+      const cashDelta = valid && Number.isFinite(cashPrice) && cashPrice > 0 ? cashPrice - totalCost : NaN;
+      return { index, program, points, fees, cpp, notes, valid, pointCost, totalCost, realizedCpp, spread, cashDelta };
+    }
+
+    function calculate() {
+      const options = [0, 1, 2].map(readOption);
+      const validOptions = options.filter(option => option.valid);
+      const minCost = validOptions.length ? Math.min(...validOptions.map(option => option.totalCost)) : NaN;
+      const winners = validOptions.filter(option => Math.abs(option.totalCost - minCost) < 0.005);
+      updateSourceBadges();
+
+      options.forEach(option => renderOption(option, winners.some(w => w.index === option.index)));
+      renderSummary(options, winners, minCost);
+      renderWinner(options, winners, minCost);
+      validCountBadge.textContent = `${validOptions.length} valid option${validOptions.length === 1 ? '' : 's'}`;
+    }
+
+    function renderOption(option, isWinner) {
+      const card = document.getElementById(`optionCard${option.index}`);
+      const badge = document.getElementById(`optionBadge${option.index}`);
+      const subtitle = document.getElementById(`optionSubtitle${option.index}`);
+      card.classList.toggle('winner', isWinner);
+      subtitle.textContent = option.program || 'Select a program';
+
+      if (!option.valid) {
+        badge.className = 'badge neutral';
+        badge.textContent = 'Pending';
+      } else if (isWinner) {
+        badge.className = 'badge good';
+        badge.textContent = 'Winner';
+      } else {
+        badge.className = 'badge neutral';
+        badge.textContent = 'Compared';
+      }
+
+      setText(`totalCost${option.index}`, option.valid ? fmtCurrency.format(option.totalCost) : '—');
+      setText(`pointCost${option.index}`, option.valid ? fmtCurrency.format(option.pointCost) : '—');
+      setText(`realizedCpp${option.index}`, Number.isFinite(option.realizedCpp) ? fmtCpp(option.realizedCpp) : '—');
+      setText(`cppSpread${option.index}`, Number.isFinite(option.spread) ? `${option.spread >= 0 ? '+' : ''}${option.spread.toFixed(2)}¢` : '—');
+      setText(`cashCompare${option.index}`, Number.isFinite(option.cashDelta) ? (option.cashDelta >= 0 ? `${fmtCurrency.format(option.cashDelta)} cheaper than cash` : `${fmtCurrency.format(Math.abs(option.cashDelta))} more than cash`) : '—');
+
+      const spreadMetric = document.getElementById(`cppSpread${option.index}`).closest('.metric');
+      spreadMetric.classList.remove('good', 'bad');
+      if (Number.isFinite(option.spread)) spreadMetric.classList.add(option.spread >= 0 ? 'good' : 'bad');
+
+      const cashMetric = document.getElementById(`cashCompare${option.index}`).closest('.metric');
+      cashMetric.classList.remove('good', 'bad');
+      if (Number.isFinite(option.cashDelta)) cashMetric.classList.add(option.cashDelta >= 0 ? 'good' : 'bad');
+    }
+
+    function renderSummary(options, winners) {
+      summaryBody.innerHTML = '';
+      const winnerIndexes = new Set(winners.map(w => w.index));
+      options.forEach(option => {
+        const tr = document.createElement('tr');
+        if (winnerIndexes.has(option.index)) tr.classList.add('row-winner');
+        tr.innerHTML = `
+          <td>${escapeHtml(option.program || `Option ${option.index + 1}`)}</td>
+          <td>${option.valid ? fmtNumber.format(option.points) : '—'}</td>
+          <td>${option.valid ? fmtCpp(option.cpp) : '—'}</td>
+          <td>${option.valid ? fmtCurrency.format(option.fees) : '—'}</td>
+          <td>${option.valid ? fmtCurrency.format(option.totalCost) : '—'}</td>
+        `;
+        summaryBody.appendChild(tr);
+      });
+    }
+
+    function renderWinner(options, winners, minCost) {
+      reasonList.innerHTML = '';
+      if (!winners.length) {
+        winnerBox.innerHTML = `
+          <h3>Enter at least one valid option.</h3>
+          <p>Add points required and CPP values to calculate the winner.</p>
+          <ul class="reason-list" id="reasonList"></ul>
+        `;
+        return;
+      }
+      const validOptions = options.filter(option => option.valid);
+      const winnerNames = winners.map(w => escapeHtml(w.program)).join(' and ');
+      const secondBest = validOptions
+        .filter(option => !winners.some(w => w.index === option.index))
+        .sort((a, b) => a.totalCost - b.totalCost)[0];
+      const cashPrice = parseFormattedNumber(document.getElementById('cashPrice').value);
+      const leadText = winners.length > 1
+        ? `${winnerNames} are tied at ${fmtCurrency.format(minCost)}.`
+        : `${winnerNames} wins at ${fmtCurrency.format(minCost)}.`;
+      const savingsVsSecond = secondBest ? secondBest.totalCost - minCost : NaN;
+      const cashDelta = Number.isFinite(cashPrice) && cashPrice > 0 ? cashPrice - minCost : NaN;
+
+      winnerBox.innerHTML = `
+        <h3>${leadText}</h3>
+        <p>This is the lowest effective total cost using published point value plus taxes and fees.</p>
+        <ul class="reason-list" id="reasonList"></ul>
+      `;
+      const list = document.getElementById('reasonList');
+      addReason(list, `Winning cost formula: points required × published CPP + taxes/fees = ${fmtCurrency.format(minCost)}.`);
+      if (Number.isFinite(savingsVsSecond)) {
+        addReason(list, `Cost advantage vs. next-best option: ${fmtCurrency.format(savingsVsSecond)}.`);
+      }
+      if (Number.isFinite(cashDelta)) {
+        addReason(list, cashDelta >= 0
+          ? `Compared with paying cash, the winning redemption is ${fmtCurrency.format(cashDelta)} cheaper on an economic-cost basis.`
+          : `Compared with paying cash, the winning redemption is ${fmtCurrency.format(Math.abs(cashDelta))} more expensive on an economic-cost basis.`);
+      }
+    }
+
+    function addReason(list, text) {
+      const li = document.createElement('li');
+      li.textContent = text;
+      list.appendChild(li);
+    }
+
+    function setText(id, text) {
+      document.getElementById(id).textContent = text;
+    }
+
+    function populateImportTemplate() {
+      const template = [
+        { program: 'Air Canada Aeroplan', type: 'Airline', cpp: 1.50, source: 'TPG July 2026', asOf: '2026-07-01' },
+        { program: 'World of Hyatt', type: 'Hotel', cpp: 1.60, source: 'TPG July 2026', asOf: '2026-07-01' },
+        { program: 'Custom Program Name', type: 'Airline or Hotel', cpp: 1.23, source: 'Your source name', asOf: 'YYYY-MM-DD' }
+      ];
+      importBox.value = JSON.stringify(template, null, 2);
+    }
+
+    function importCppValues(mode) {
+      let imported;
+      try {
+        imported = parseImport(importBox.value);
+      } catch (error) {
+        showToast(error.message || 'Import failed. Check JSON or CSV format.');
+        return;
+      }
+      const normalized = normalizeLibrary(imported);
+      if (!normalized.length) {
+        showToast('No valid CPP rows found. Each row needs at least program and cpp.');
+        return;
+      }
+      if (mode === 'replace') {
+        cppLibrary = normalized;
+      } else {
+        const merged = new Map(cppLibrary.map(item => [item.program.toLowerCase(), item]));
+        normalized.forEach(item => merged.set(item.program.toLowerCase(), item));
+        cppLibrary = Array.from(merged.values()).sort((a, b) => a.type.localeCompare(b.type) || a.program.localeCompare(b.program));
+      }
+      const importedSources = [...new Set(normalized.map(item => item.source).filter(Boolean))];
+      currentSourceLabel = importedSources.length === 1 ? importedSources[0] : `${importedSources.length || 1} imported CPP sources`;
+      saveLibrary();
+      saveCurrentSourceLabel();
+      refreshProgramSelects();
+      refreshSelectedOptionCppValues();
+      renderLibraryTable();
+      updateSourceBadges();
+      calculate();
+      showToast(`${normalized.length} CPP row${normalized.length === 1 ? '' : 's'} ${mode === 'replace' ? 'replaced the library' : 'merged into the library'}.`);
+    }
+
+    function parseImport(raw) {
+      const text = String(raw || '').trim();
+      if (!text) throw new Error('Paste JSON or CSV data before importing.');
+      if (text.startsWith('[') || text.startsWith('{')) {
+        const parsed = JSON.parse(text);
+        return Array.isArray(parsed) ? parsed : [parsed];
+      }
+      return parseCsv(text);
+    }
+
+    function parseCsv(text) {
+      const rows = text.split(/\r?\n/).filter(Boolean).map(parseCsvLine);
+      if (rows.length < 2) throw new Error('CSV import needs a header row and at least one data row.');
+      const headers = rows[0].map(h => h.trim());
+      const data = rows.slice(1).map(cols => {
+        const row = {};
+        headers.forEach((header, index) => row[header] = cols[index] || '');
+        return row;
+      });
+      return data;
+    }
+
+    function parseCsvLine(line) {
+      const result = [];
+      let current = '';
+      let inQuotes = false;
+      for (let i = 0; i < line.length; i++) {
+        const char = line[i];
+        const next = line[i + 1];
+        if (char === '"' && inQuotes && next === '"') {
+          current += '"';
+          i++;
+        } else if (char === '"') {
+          inQuotes = !inQuotes;
+        } else if (char === ',' && !inQuotes) {
+          result.push(current.trim());
+          current = '';
+        } else {
+          current += char;
+        }
+      }
+      result.push(current.trim());
+      return result;
+    }
+
+    function exportCurrentLibrary() {
+      const exported = JSON.stringify(cppLibrary, null, 2);
+      importBox.value = exported;
+      downloadTextFile('cpp-library-export.json', exported);
+      showToast('Current CPP library exported and copied into the import box.');
+    }
+
+    function resetLibrary() {
+      cppLibrary = clone(DEFAULT_CPP_LIBRARY);
+      currentSourceLabel = 'TPG July 2026';
+      saveLibrary();
+      saveCurrentSourceLabel();
+      refreshProgramSelects();
+      refreshSelectedOptionCppValues();
+      renderLibraryTable();
+      populateImportTemplate();
+      updateSourceBadges();
+      calculate();
+      showToast('CPP library reset to the built-in TPG July 2026 defaults.');
+    }
+
+    function downloadTextFile(filename, text) {
+      const blob = new Blob([text], { type: 'application/json;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    }
+
+    function renderLibraryTable() {
+      libraryTableBody.innerHTML = '';
+      cppLibrary.forEach(item => {
+        const tr = document.createElement('tr');
+        const source = `${item.source || 'Imported'}${item.asOf ? ` (${item.asOf})` : ''}`;
+        tr.innerHTML = `<td>${escapeHtml(item.program)}</td><td>${escapeHtml(item.type)}</td><td>${escapeHtml(source)}</td><td>${fmtCpp(item.cpp)}</td>`;
+        libraryTableBody.appendChild(tr);
+      });
+    }
+
+    function escapeHtml(value) {
+      return String(value)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    function showToast(message) {
+      const toast = document.getElementById('toast');
+      toast.textContent = message;
+      toast.classList.remove('show');
+      void toast.offsetWidth;
+      toast.classList.add('show');
+    }
+  </script>
+</body>
+</html>

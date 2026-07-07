@@ -1,0 +1,23 @@
+[
+  {
+    "program": "Air Canada Aeroplan",
+    "type": "Airline",
+    "cpp": 1.5,
+    "source": "TPG July 2026",
+    "asOf": "2026-07-01"
+  },
+  {
+    "program": "World of Hyatt",
+    "type": "Hotel",
+    "cpp": 1.6,
+    "source": "TPG July 2026",
+    "asOf": "2026-07-01"
+  },
+  {
+    "program": "Custom Program Name",
+    "type": "Airline or Hotel",
+    "cpp": 1.23,
+    "source": "Your source name",
+    "asOf": "YYYY-MM-DD"
+  }
+]
